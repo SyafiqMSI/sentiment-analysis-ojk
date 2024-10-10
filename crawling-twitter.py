@@ -35,8 +35,8 @@ def create_driver(use_chrome):
         options.add_argument("--start-maximized")
         options.add_argument("--disable-infobars")
         options.headless = False
-        service = FirefoxService(executable_path=GECKO_PATH)
-        return webdriver.Firefox(service=service, options=options)
+        # service = FirefoxService(executable_path=GECKO_PATH)
+        return webdriver.Firefox(options=options)
 
 def login(driver):
     try:
@@ -180,9 +180,9 @@ def save_daily_results(df, date):
 def main():
     os.makedirs('log', exist_ok=True)
     start_date = datetime(2021, 5, 1)
-    end_date = datetime(2024, 5, 31)
+    end_date = datetime(2024, 5, 30)
     current_date = end_date
-    use_chrome = True  # Mulai dengan Chrome
+    use_chrome = True  
 
     while current_date >= start_date:
         try:
