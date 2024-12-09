@@ -77,13 +77,18 @@ def main():
             stop_words
         )
         
-        open_questions_keyword_filter = st.sidebar.multiselect(
-            'Keywords in Open Questions',
-            options=[kw[0] for kw in open_questions_keywords],
-            default=[],  
-            format_func=lambda x: f"{x} ({dict(open_questions_keywords)[x]} times)"
+        jenis_survei_filter = st.sidebar.multiselect(
+            'Select Jenis Survei',
+            options=df['JENIS SURVEI'].unique().tolist(),
+            default=df['JENIS SURVEI'].unique().tolist()
         )
         
+        # New: Tipe Question Filter
+        tipe_question_filter = st.sidebar.multiselect(
+            'Select Fungsi',
+            options=df['TIPE QUESTION'].unique().tolist(),
+            default=df['TIPE QUESTION'].unique().tolist()
+        )
         
         bidang_filter = st.sidebar.multiselect(
             'Select Bidang',
@@ -97,11 +102,6 @@ def main():
             default=df['SATKER (AKRONIM)'].unique().tolist()
         )
         
-        jenis_survei_filter = st.sidebar.multiselect(
-            'Select Jenis Survei',
-            options=df['JENIS SURVEI'].unique().tolist(),
-            default=df['JENIS SURVEI'].unique().tolist()
-        )
         
         label_filter = st.sidebar.multiselect(
             'Select Label',
@@ -109,8 +109,15 @@ def main():
             default=df['Label'].unique().tolist()
         )
         
+        open_questions_keyword_filter = st.sidebar.multiselect(
+                'Keywords in Open Questions',
+                options=[kw[0] for kw in open_questions_keywords],
+                default=[],  
+                format_func=lambda x: f"{x} ({dict(open_questions_keywords)[x]} times)"
+        )
        
         filtered_df = df[
+            (df['TIPE QUESTION'].isin(tipe_question_filter)) &
             (df['BIDANG'].isin(bidang_filter)) &
             (df['SATKER (AKRONIM)'].isin(satker_filter)) &
             (df['JENIS SURVEI'].isin(jenis_survei_filter)) &
