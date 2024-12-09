@@ -244,11 +244,14 @@ def main():
             st.plotly_chart(label_count_fig)
         
         st.header('Detailed Data')
-        search_term = st.text_input('Search across all columns')
+        search_placeholder = "Search across all columns"
+
+        search_term = st.text_input('Search Tabel Query', placeholder=search_placeholder, key="search_input")
+
         if search_term:
             search_df = filtered_df[
                 filtered_df.apply(
-                    lambda row: row.astype(str).str.contains(search_term, case=False).any(), 
+                    lambda row: row.astype(str).str.contains(search_term, case=False).any(),
                     axis=1
                 )
             ]
