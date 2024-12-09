@@ -37,21 +37,90 @@ def get_keyword_options(df, columns, stop_words):
     
     return sorted(keyword_counts.items(), key=lambda x: x[1], reverse=True)
 
-def custom_average(row):
-    columns = ['RESOURCE PERCEPTION', 'PERFORMANCE DELIVERY', 'OUTCOME SATISFACTION']
-    non_zero_count = sum(1 for col in columns if not pd.isna(row[col]) and row[col] != 0)
-    if non_zero_count == 0:
-        return 0
+def extract_action_phrases(text):
+    if pd.isna(text):
+        return []
     
-    total = sum(row[col] for col in columns if not pd.isna(row[col]) and row[col] != 0)
-    return total / non_zero_count
+    text = re.sub(r'\s+', ' ', str(text).lower())
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    conjunctions = ['dan', 'atau', 'serta', 'dengan', 'tetapi', 'namun', 'melainkan', 'sebaliknya','yang']
+    
+    matches = []
+    
+    words = text.split()
+    
+    for i in range(len(words)-2):
+        if words[i+1] in conjunctions:
+            full_phrase = f"{words[i]} {words[i+1]} {words[i+2]}"
+            matches.append(full_phrase)
+    
+    additional_patterns = [
+        r'pe\w+an\s\w+',     
+        r'me\w+kan\s\w+',    
+        r'di\w+kan\s\w+',    
+    ]
+    
+    for pattern in additional_patterns:
+        matches.extend(re.findall(pattern, text))
+    
+    return matches
 
-def fill_missing_with_median(df, columns):
-    for col in columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-        median_value = df[col].median(skipna=True)
-        df[col] = df[col].apply(lambda x: median_value if pd.isna(x) or x == 0 else x)
-        
+def analyze_action_phrases(df):
+    all_phrases = []
+    for text in df['Combined_Text']:
+        all_phrases.extend(extract_action_phrases(text))
+    
+    phrase_counts = Counter()
+    for phrase in all_phrases:
+        normalized_phrase = re.sub(r'\s+', ' ', phrase).strip()
+        phrase_counts[normalized_phrase] += 1
+    
+    total_phrases = sum(phrase_counts.values())
+    
+    phrase_data = []
+    for phrase, count in phrase_counts.items():
+        percentage = (count / total_phrases) * 100
+        phrase_data.append({
+            'keyword': phrase,
+            'jumlah': count,
+            'presentase': f"{percentage:.2f}%"
+        })
+    
+    phrase_data.sort(key=lambda x: x['jumlah'], reverse=True)
+    
+    return pd.DataFrame(phrase_data)
+
+def calculate_sentiment_weight(df):
+    label_map = {
+        1: "sangat tidak setuju",
+        2: "tidak setuju",
+        3: "kurang setuju",
+        4: "cukup setuju",
+        5: "setuju",
+        6: "sangat setuju"
+    }
+    
+    reverse_label_map = {v: k for k, v in label_map.items()}
+    
+    df['Label_Index'] = df['Label'].map(reverse_label_map)
+    
+    def calculate_weight(index):
+        if index == 0:
+            return 1
+        elif 0.1 <= index <= 3.9:
+            return index + 0.73 
+        elif 4 <= index <= 6:
+            return 6
+        else:
+            return None
+    
+    df['NILAI_BOBOT'] = df['Label_Index'].apply(calculate_weight)
+    
+    average_bobot_sentimen = df['NILAI_BOBOT'].mean()
+    
+    return average_bobot_sentimen
+
 def main():
     st.title('OJK Survey Data Dashboard')
     
@@ -64,12 +133,8 @@ def main():
     df = load_data()
     
     if not df.empty:
-        columns_to_fill = ['RESOURCE PERCEPTION', 'PERFORMANCE DELIVERY', 'OUTCOME SATISFACTION']
-        fill_missing_with_median(df, columns_to_fill)
         
         st.sidebar.header('Filters')
-        
-        df['Custom Average'] = df.apply(custom_average, axis=1)
         
         open_questions_keywords = get_keyword_options(
             df, 
@@ -139,9 +204,11 @@ def main():
                     axis=1
                 )
             ]
+            
+        average_sentiment_weight = calculate_sentiment_weight(df)
         
         st.header('Survey Metrics')
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         
         with col1:
             st.metric('Total Responses', filtered_df.shape[0])
@@ -149,6 +216,10 @@ def main():
         with col2:
             label_counts = filtered_df['Label'].value_counts()
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
+         
+        with col3:
+            st.metric('Avg Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
+
         st.header('Visualizations')
         
         col1, col2 = st.columns(2)
@@ -183,19 +254,26 @@ def main():
             ]
         else:
             search_df = filtered_df
-        
-        st.dataframe(search_df)
-        st.header('Trend Response')
-        custom_avg_line = px.line(
-            filtered_df.groupby('Label')['Custom Average'].mean().reset_index(), 
-            x='Label', 
-            y='Custom Average', 
-            title='Average score Resource Perception Performance Delivery Outcome Satisfaction',
-            markers=True
-        )
-        st.plotly_chart(custom_avg_line)
 
+        st.dataframe(search_df)
+
+        st.header('Word Analysis')
+        verb_active_df = analyze_action_phrases(search_df)
         
+        if not verb_active_df.empty:
+            st.dataframe(verb_active_df, use_container_width=True)
+            
+            st.subheader('Top Words')
+            top_words_fig = px.bar(
+                verb_active_df.head(10), 
+                x='keyword', 
+                y='jumlah', 
+                title='Top 10 Words'
+            )
+            st.plotly_chart(top_words_fig)
+        else:
+            st.write("No verb or active words found in the filtered dataset.")
+
         if open_questions_keyword_filter:
             st.header('Keyword Analysis')
             
@@ -224,8 +302,6 @@ def main():
             ])
             fig.update_layout(barmode='group', title='Keyword Frequencies in Open Questions')
             st.plotly_chart(fig)
-
-        
     
     else:
         st.warning('No data loaded. Please check the data file path.')
