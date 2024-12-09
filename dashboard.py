@@ -80,14 +80,19 @@ def main():
         jenis_survei_filter = st.sidebar.multiselect(
             'Select Jenis Survei',
             options=df['JENIS SURVEI'].unique().tolist(),
-            default=df['JENIS SURVEI'].unique().tolist()
+            default=df['JENIS SURVEI'].unique().tolist(),
+            key='jenis_survei_filter'
         )
         
-        # New: Tipe Question Filter
+        available_tipe_questions = df[
+            df['JENIS SURVEI'].isin(jenis_survei_filter)
+        ]['TIPE QUESTION'].unique().tolist()
+        
         tipe_question_filter = st.sidebar.multiselect(
             'Select Fungsi',
-            options=df['TIPE QUESTION'].unique().tolist(),
-            default=df['TIPE QUESTION'].unique().tolist()
+            options=available_tipe_questions,
+            default=available_tipe_questions,
+            key='tipe_question_filter'
         )
         
         bidang_filter = st.sidebar.multiselect(
@@ -101,7 +106,6 @@ def main():
             options=df['SATKER (AKRONIM)'].unique().tolist(),
             default=df['SATKER (AKRONIM)'].unique().tolist()
         )
-        
         
         label_filter = st.sidebar.multiselect(
             'Select Label',
