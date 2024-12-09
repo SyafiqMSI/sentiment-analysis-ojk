@@ -10,7 +10,7 @@ st.set_page_config(page_title='OJK Survey Dashboard', layout='wide')
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv('./data/hasil/all_data.csv', sep=';', encoding='utf-8')
+        df = pd.read_csv('data/hasil/all_data.csv', sep=';', encoding='utf-8')
         return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
