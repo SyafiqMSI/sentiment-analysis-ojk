@@ -218,7 +218,7 @@ def main():
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
-            st.metric('Avg Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
+            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
 
         st.header('Visualizations')
         
