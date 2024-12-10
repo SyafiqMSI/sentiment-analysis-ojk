@@ -1,0 +1,21 @@
+{
+    "sangat baik": "sangat setuju",
+    "pasti": "sangat setuju",
+    "sangat mendukung": "sangat setuju",
+    "secara penuh setuju": "sangat setuju",
+    "setuju": "setuju",
+    "cukup yakin": "setuju",
+    "tidak merasa kuat": "cukup setuju",
+    "tidak ada keberpihakan": "cukup setuju",
+    "tidak berpendapat": "cukup setuju",
+    "biasa saja": "cukup setuju",
+    "agak tidak setuju": "cukup setuju",
+    "tidak sepenuhnya setuju": "cukup setuju",
+    "tidak yakin": "cukup setuju",
+    "tidak terlalu mendukung": "cukup setuju",
+    "sangat tidak setuju": "sangat tidak setuju",
+    "tolak OJK": "sangat tidak setuju",
+    "sepenuhnya tidak mendukung": "sangat tidak setuju",
+    "menentang": "sangat tidak setuju",
+    "tidak setuju sama sekali": "sangat tidak setuju"
+}
