@@ -14,7 +14,7 @@ st.set_page_config(page_title='OJK Survey Dashboard', layout='wide')
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv('data/hasil/all_data.csv', sep=';', encoding='utf-8')
+        df = pd.read_csv('data/hasil/main_data.csv', sep=';', encoding='utf-8')
         return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
@@ -208,17 +208,17 @@ def main():
         average_sentiment_weight = calculate_sentiment_weight(df)
         
         st.header('Survey Metrics')
-        col1, col2, col3 = st.columns(3)
+        col2, col3 = st.columns(2)
         
-        with col1:
-            st.metric('Total Responses', filtered_df.shape[0])
+        # with col1:
+        #     st.metric('Total Responses', filtered_df.shape[0])
         
         with col2:
             label_counts = filtered_df['Label'].value_counts()
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
-            st.metric('Avg Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
+            st.metric('Avg Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
 
         st.header('Visualizations')
         
@@ -258,7 +258,11 @@ def main():
         else:
             search_df = filtered_df
 
-        st.dataframe(search_df)
+        columns_to_exclude = ['New_Label','Confidence']  
+        display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
+        st.dataframe(display_df)
+        # st.dataframe(search_df)
+        
 
         st.header('Word Analysis')
         verb_active_df = analyze_action_phrases(search_df)
