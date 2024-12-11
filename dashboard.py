@@ -270,7 +270,7 @@ def internal_eksternal_page():
         else:
             search_df = filtered_df
 
-        columns_to_exclude = ['New_Label','Confidence','NAMA PIC/RESPONDEN','EMAIL','KONTAK','EMAIL CADANGAN','KOTAK CADANGAN']  
+        columns_to_exclude = ['New_Label','Confidence','NAMA PIC/RESPONDEN','EMAIL','KONTAK','EMAIL CADANGAN','KOTAK CADANGAN','Combined_Text']  
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
         st.dataframe(display_df)
         # st.dataframe(search_df)
