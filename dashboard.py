@@ -326,7 +326,7 @@ def internal_eksternal_page():
         
 def idi_page():
     st.title('IDI Survey Data Dashboard')
-    idi_df = load_data('data/hasil/main_data_idi.csv')
+    idi_df = load_data('data/hasil/main_data_idi (1).csv')
     
     if not idi_df.empty:
         
@@ -383,7 +383,7 @@ def idi_page():
         keyword_df = get_keyword_frequency(idi_df, 'Combined_Text', stop_words)
         
         
-        average_sentiment_weight = calculate_sentiment_weight(idi_df)
+        average_sentiment_weight_idi = calculate_sentiment_weight(idi_df)
         
         st.header('Survey Metrics')
         col2, col3 = st.columns(2)
@@ -396,7 +396,7 @@ def idi_page():
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
-            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
+            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight_idi):.2f}")
 
         st.header('Visualizations')
         
