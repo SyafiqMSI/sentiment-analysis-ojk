@@ -161,10 +161,9 @@ def internal_eksternal_page():
             key='jenis_survei_filter'
         )
         
-        available_tipe_questions = df[
-            df['JENIS SURVEI'].isin(jenis_survei_filter)
-        ]['TIPE QUESTION'].unique().tolist()
+        filtered_df_jenis = df[df['JENIS SURVEI'].isin(jenis_survei_filter)]
         
+        available_tipe_questions = filtered_df_jenis['TIPE QUESTION'].unique().tolist()
         tipe_question_filter = st.sidebar.multiselect(
             'Select Fungsi',
             options=available_tipe_questions,
@@ -172,39 +171,51 @@ def internal_eksternal_page():
             key='tipe_question_filter'
         )
         
+        filtered_df_tipe = filtered_df_jenis[filtered_df_jenis['TIPE QUESTION'].isin(tipe_question_filter)]
+        
+        available_bidang = filtered_df_tipe['BIDANG'].unique().tolist()
         bidang_filter = st.sidebar.multiselect(
             'Select Bidang',
-            options=df['BIDANG'].unique().tolist(),
-            default=df['BIDANG'].unique().tolist()
+            options=available_bidang,
+            default=available_bidang,
+            key='bidang_filter'
         )
         
+        filtered_df_bidang = filtered_df_tipe[filtered_df_tipe['BIDANG'].isin(bidang_filter)]
+        
+        available_satker = filtered_df_bidang['SATKER (AKRONIM)'].unique().tolist()
         satker_filter = st.sidebar.multiselect(
             'Select Satker',
-            options=df['SATKER (AKRONIM)'].unique().tolist(),
-            default=df['SATKER (AKRONIM)'].unique().tolist()
+            options=available_satker,
+            default=available_satker,
+            key='satker_filter'
         )
         
+        filtered_df_satker = filtered_df_bidang[filtered_df_bidang['SATKER (AKRONIM)'].isin(satker_filter)]
+        
+        available_labels = filtered_df_satker['Label'].unique().tolist()
         label_filter = st.sidebar.multiselect(
             'Select Label',
-            options=df['Label'].unique().tolist(),
-            default=df['Label'].unique().tolist()
+            options=available_labels,
+            default=available_labels,
+            key='label_filter'
+        )
+        
+        filtered_df = filtered_df_satker[filtered_df_satker['Label'].isin(label_filter)]
+        
+        open_questions_keywords = get_keyword_options(
+            filtered_df, 
+            ['OPEN QUESTION 1', 'OPEN QUESTION 2'], 
+            stop_words
         )
         
         open_questions_keyword_filter = st.sidebar.multiselect(
-                'Keywords in Open Questions',
-                options=[kw[0] for kw in open_questions_keywords],
-                default=[],  
-                format_func=lambda x: f"{x} ({dict(open_questions_keywords)[x]} times)"
+            'Keywords in Open Questions',
+            options=[kw[0] for kw in open_questions_keywords],
+            default=[],  
+            format_func=lambda x: f"{x} ({dict(open_questions_keywords)[x]} times)"
         )
        
-        filtered_df = df[
-            (df['TIPE QUESTION'].isin(tipe_question_filter)) &
-            (df['BIDANG'].isin(bidang_filter)) &
-            (df['SATKER (AKRONIM)'].isin(satker_filter)) &
-            (df['JENIS SURVEI'].isin(jenis_survei_filter)) &
-            (df['Label'].isin(label_filter))
-        ]
-        
         if open_questions_keyword_filter:
             filtered_df = filtered_df[
                 filtered_df.apply(
@@ -335,35 +346,39 @@ def idi_page():
         except LookupError:
             nltk.download('stopwords', quiet=True)
             stop_words = set(stopwords.words('indonesian'))
-            
+        
+        st.sidebar.header('Cascading Filters')
+        
         jenis_filter = st.sidebar.multiselect(
             'Select Jenis',
             options=idi_df['Jenis'].unique().tolist(),
-            default=idi_df['Jenis'].unique().tolist()
+            default=idi_df['Jenis'].unique().tolist(),
+            key='jenis_filter'
         )
         
+        filtered_df_jenis = idi_df[idi_df['Jenis'].isin(jenis_filter)]
+        
+        available_labels = filtered_df_jenis['Label'].unique().tolist()
         label_filter = st.sidebar.multiselect(
             'Select Label',
-            options=idi_df['Label'].unique().tolist(),
-            default=idi_df['Label'].unique().tolist()
+            options=available_labels,
+            default=available_labels,
+            key='label_filter_idi'
         )
-            
-        filtered_df = idi_df[
-            (idi_df['Jenis'].isin(jenis_filter)) &
-            (idi_df['Label'].isin(label_filter))
-        ]
+        
+        filtered_df = filtered_df_jenis[filtered_df_jenis['Label'].isin(label_filter)]
         
         idi_keywords = get_keyword_options(
-            idi_df, 
+            filtered_df, 
             ['Kualitas Layanan', 'Hubungan dengan OJK', 'Kualitas SDM', 'Saran'], 
             stop_words
         )
         
         idi_keyword_filter = st.sidebar.multiselect(
-                'Keywords in IDI',
-                options=[kw[0] for kw in idi_keywords],
-                default=[],  
-                format_func=lambda x: f"{x} ({dict(idi_keywords)[x]} times)"
+            'Keywords in IDI',
+            options=[kw[0] for kw in idi_keywords],
+            default=[],  
+            format_func=lambda x: f"{x} ({dict(idi_keywords)[x]} times)"
         )
         
         if idi_keyword_filter:
@@ -380,16 +395,10 @@ def idi_page():
                 )
             ]
         
-        keyword_df = get_keyword_frequency(idi_df, 'Combined_Text', stop_words)
-        
-        
         average_sentiment_weight_idi = calculate_sentiment_weight(idi_df)
         
         st.header('Survey Metrics')
         col2, col3 = st.columns(2)
-        
-        # with col1:
-        #     st.metric('Total Responses', filtered_df.shape[0])
         
         with col2:
             label_counts = filtered_df['Label'].value_counts()
@@ -424,7 +433,7 @@ def idi_page():
         st.header('Detailed Data')
         search_placeholder = "Search across all columns"
 
-        search_term = st.text_input('Search Tabel Query', placeholder=search_placeholder, key="search_input")
+        search_term = st.text_input('Search Tabel Query', placeholder=search_placeholder, key="search_input_idi")
 
         if search_term:
             search_df = filtered_df[
@@ -491,7 +500,7 @@ def idi_page():
                 go.Bar(name='Kualitas Layanan', x=kw_freq_df['Keyword'], y=kw_freq_df['Kualitas Layanan Count']),
                 go.Bar(name='Hubungan dengan OJK', x=kw_freq_df['Keyword'], y=kw_freq_df['Hubungan dengan OJK Count']),
                 go.Bar(name='Kualitas SDM', x=kw_freq_df['Keyword'], y=kw_freq_df['Kualitas SDM Count']),
-                go.Bar(name='Saran Question 2', x=kw_freq_df['Keyword'], y=kw_freq_df['Saran Question 2 Count'])
+                go.Bar(name='Saran', x=kw_freq_df['Keyword'], y=kw_freq_df['Saran Count'])
             ])
             fig.update_layout(barmode='group', title='Keyword Frequencies')
             st.plotly_chart(fig)
