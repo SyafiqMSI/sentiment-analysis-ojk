@@ -104,6 +104,9 @@ def analyze_action_phrases(df):
     return pd.DataFrame(phrase_data)
 
 def calculate_sentiment_weight(df):
+    if df.empty:
+        return 0
+    
     label_map = {
         1: "sangat tidak setuju",
         2: "tidak setuju",
@@ -149,7 +152,6 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         for i, column in enumerate(filter_columns):
             available_options = filtered_df[column].unique().tolist()
             
-            # Create filter with unique key to prevent conflicts
             filter_key = f'filter_{column}_{title}'
             selected_options = st.sidebar.multiselect(
                 f'Select {column}',
@@ -158,10 +160,8 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
                 key=filter_key
             )
             
-            # Apply filter
             filtered_df = filtered_df[filtered_df[column].isin(selected_options)]
         
-        # Keywords Filter for Open Questions
         keywords = get_keyword_options(
             filtered_df, 
             open_question_columns, 
@@ -187,10 +187,8 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
                 )
             ]
         
-        # Sentiment Analysis
         average_sentiment_weight = calculate_sentiment_weight(df)
         
-        # Metrics
         st.header('Survey Metrics')
         col2, col3 = st.columns(2)
         
@@ -199,16 +197,16 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
+            if filtered_df.empty:
+                average_sentiment_weight = 0  
             if title == "Adjustment Factor 2 Open Question dengan pembulatan":
                 st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
             elif title == "Adjustment Factor 1 Open Question dengan pembulatan":
                 st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
             else:
                 st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
-            
 
         
-        # Visualizations
         st.header('Visualizations')
         
         col1, col2 = st.columns(2)
@@ -232,7 +230,6 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
             )
             st.plotly_chart(label_count_fig)
         
-        # Detailed Data
         st.header('Detailed Data')
         search_term = st.text_input('Search Tabel Query', placeholder="Search across all columns", key=f"search_input_{title}")
 
@@ -277,7 +274,6 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         else:
             st.write("No verb or active words found in the filtered dataset.")
         
-        # Keyword Analysis
         if keyword_filter:
             st.header('Keyword Analysis')
             
@@ -295,7 +291,6 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
             kw_freq_df = pd.DataFrame(kw_freq_data)
             st.dataframe(kw_freq_df, use_container_width=True)
             
-            # Keyword Frequency Bar Chart
             bar_data = []
             for col in open_question_columns:
                 bar_data.append(
@@ -384,7 +379,10 @@ def idi_page():
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
-            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight_idi):.2f}")
+            if filtered_df.empty:
+                average_sentiment_weight = 0  
+            else: 
+                st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight_idi):.2f}")
 
         st.header('Visualizations')
         
