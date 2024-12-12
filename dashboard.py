@@ -241,7 +241,7 @@ def internal_eksternal_page():
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
-            st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
+            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
 
         st.header('Visualizations')
         
@@ -281,7 +281,7 @@ def internal_eksternal_page():
         else:
             search_df = filtered_df
 
-        columns_to_exclude = ['New_Label','Confidence','NAMA PIC/RESPONDEN','EMAIL','KONTAK','EMAIL CADANGAN','KOTAK CADANGAN','Combined_Text','NILAI_SENTIMEN']  
+        columns_to_exclude = ['New_Label','Confidence','NAMA PIC/RESPONDEN','EMAIL','KONTAK','EMAIL CADANGAN','KOTAK CADANGAN','Combined_Text']  
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
         st.dataframe(display_df)
         # st.dataframe(search_df)
@@ -337,7 +337,7 @@ def internal_eksternal_page():
         
 def idi_page():
     st.title('IDI Survey Data Dashboard')
-    idi_df = load_data('data/hasil/main_data_idi_sentimen.csv')
+    idi_df = load_data('data/hasil/main_data_idi (1).csv')
     
     if not idi_df.empty:
         
@@ -445,7 +445,7 @@ def idi_page():
         else:
             search_df = filtered_df
 
-        columns_to_exclude = ['New_Label','Confidence','NILAI_SENTIMEN']  
+        columns_to_exclude = ['New_Label','Confidence']  
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
         st.dataframe(display_df)
 
