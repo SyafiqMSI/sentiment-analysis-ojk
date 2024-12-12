@@ -199,7 +199,14 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
-            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight, 2):.2f}")
+            if title == "Adjustment Factor 2 Open Question dengan pembulatan":
+                st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
+            elif title == "Adjustment Factor 1 Open Question dengan pembulatan":
+                st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
+            else:
+                st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
+            
+
         
         # Visualizations
         st.header('Visualizations')
@@ -244,10 +251,10 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         
         columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text']
 
-        if title == "Adjustment Factor 2 Open Question with Nilai Label (Real)":
+        if title == "Adjustment Factor 2 Open Question dengan nilai real":
             columns_to_exclude.append('NILAI_SENTIMEN')
             
-        if title == "Adjustment Factor 1 Open Question with Nilai Label (Real)":
+        if title == "Adjustment Factor 1 Open Question dengan nilai real":
             columns_to_exclude.append('NILAI_SENTIMEN')
 
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
@@ -495,19 +502,19 @@ def main():
     st.sidebar.title("Navigation")
     
     datasets = {
-        "Adjustment Factor 2 Open Question (Passing Nilai)": {
+        "Adjustment Factor 2 Open Question dengan pembulatan": {
             'path': 'data/hasil/main_data.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
-        "Adjustment Factor 1 Open Question (Passing Nilai)": {
+        "Adjustment Factor 1 Open Question dengan pembulatan": {
             'path': 'data/hasil/main_data_REVREV.csv',
             'open_questions': ['OPEN QUESTION 1']
         },
-        "Adjustment Factor 2 Open Question with Nilai Label (Real)": {
+        "Adjustment Factor 2 Open Question dengan nilai real": {
             'path': 'data/hasil/main_data.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
-        "Adjustment Factor 1 Open Question with Nilai Label (Real)": {
+        "Adjustment Factor 1 Open Question dengan nilai real": {
             'path': 'data/hasil/main_data_REVREV.csv',
             'open_questions': ['OPEN QUESTION 1']
         }
