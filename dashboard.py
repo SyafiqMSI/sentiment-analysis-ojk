@@ -103,9 +103,17 @@ def analyze_action_phrases(df):
     
     return pd.DataFrame(phrase_data)
 
-def calculate_sentiment_weight(df):
+def calculate_sentiment_weight(df, filter_columns=None):
     if df.empty:
         return 0
+    
+    if filter_columns and isinstance(filter_columns, dict):
+        filtered_df = df.copy()
+        for column, selected_options in filter_columns.items():
+            if selected_options and len(selected_options) > 0:
+                filtered_df = filtered_df[filtered_df[column].isin(selected_options)]
+    else:
+        filtered_df = df
     
     label_map = {
         1: "sangat tidak setuju",
@@ -118,7 +126,7 @@ def calculate_sentiment_weight(df):
     
     reverse_label_map = {v: k for k, v in label_map.items()}
     
-    df['Label_Index'] = df['Label'].map(reverse_label_map)
+    filtered_df['Label_Index'] = filtered_df['Label'].map(reverse_label_map)
     
     def calculate_weight(index):
         if index == 0:
@@ -130,13 +138,19 @@ def calculate_sentiment_weight(df):
         else:
             return None
     
-    df['NILAI_SENTIMEN'] = df['Label_Index'].apply(calculate_weight)
+    if 'pembulatan' in df['Title'].iloc[0]:
+        filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index'].apply(calculate_weight)
+    else:
+        filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index']
     
-    average_bobot_sentimen = df['NILAI_SENTIMEN'].mean()
+    average_bobot_sentimen = filtered_df['NILAI_SENTIMEN'].mean()
     
     return average_bobot_sentimen
 
 def create_survey_dashboard(df, title, stop_words, open_question_columns):
+    
+    df['Title'] = title
+    
     st.title(title)
     
     if not df.empty:
@@ -146,6 +160,8 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
             col for col in ['JENIS SURVEI', 'TIPE QUESTION', 'BIDANG', 'SATKER (AKRONIM)', 'Label'] 
             if col in df.columns
         ]
+        
+        selected_filters = {}
         
         filtered_df = df.copy()
         
@@ -159,6 +175,8 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
                 default=available_options,
                 key=filter_key
             )
+            
+            selected_filters[column] = selected_options
             
             filtered_df = filtered_df[filtered_df[column].isin(selected_options)]
         
@@ -186,8 +204,15 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
                     axis=1
                 )
             ]
-        
-        average_sentiment_weight = calculate_sentiment_weight(df)
+            
+        filter_columns_dict = {
+            col: selected_filters.get(col, []) for col in filter_columns
+        }
+
+        average_sentiment_weight = calculate_sentiment_weight(
+            df, 
+            filter_columns_dict  
+        )
         
         st.header('Survey Metrics')
         col2, col3 = st.columns(2)
@@ -314,6 +339,10 @@ def idi_page():
     idi_df = load_data('data/hasil/main_data_idi_sentimen.csv')
     
     if not idi_df.empty:
+        filter_columns = {
+            'Jenis': jenis_filter,
+            'Label': label_filter
+        }
         
         try:
             stop_words = set(stopwords.words('indonesian'))
@@ -369,7 +398,10 @@ def idi_page():
                 )
             ]
         
-        average_sentiment_weight_idi = calculate_sentiment_weight(idi_df)
+        average_sentiment_weight_idi = calculate_sentiment_weight(
+            idi_df, 
+            filter_columns
+        )
         
         st.header('Survey Metrics')
         col2, col3 = st.columns(2)
