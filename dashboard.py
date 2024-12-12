@@ -80,7 +80,7 @@ def extract_action_phrases(text):
 
 def analyze_action_phrases(df):
     all_phrases = []
-    for text in df['Combined_Text']:
+    for text in df['Text']:
         all_phrases.extend(extract_action_phrases(text))
     
     phrase_counts = Counter()
@@ -133,116 +133,75 @@ def calculate_sentiment_weight(df):
     
     return average_bobot_sentimen
 
-def internal_eksternal_page():
-    st.title('OJK Survey Data Dashboard')
-    
-    try:
-        stop_words = set(stopwords.words('indonesian'))
-    except LookupError:
-        nltk.download('stopwords', quiet=True)
-        stop_words = set(stopwords.words('indonesian'))
-    
-    df = load_data('data/hasil/main_data.csv')
+def create_survey_dashboard(df, title, stop_words, open_question_columns):
+    st.title(title)
     
     if not df.empty:
+        st.sidebar.header('Cascading Filters')
         
-        st.sidebar.header('Filters')
+        filter_columns = [
+            col for col in ['JENIS SURVEI', 'TIPE QUESTION', 'BIDANG', 'SATKER (AKRONIM)', 'Label'] 
+            if col in df.columns
+        ]
         
-        open_questions_keywords = get_keyword_options(
-            df, 
-            ['OPEN QUESTION 1', 'OPEN QUESTION 2'], 
-            stop_words
-        )
+        filtered_df = df.copy()
         
-        jenis_survei_filter = st.sidebar.multiselect(
-            'Select Jenis Survei',
-            options=df['JENIS SURVEI'].unique().tolist(),
-            default=df['JENIS SURVEI'].unique().tolist(),
-            key='jenis_survei_filter'
-        )
+        for i, column in enumerate(filter_columns):
+            available_options = filtered_df[column].unique().tolist()
+            
+            # Create filter with unique key to prevent conflicts
+            filter_key = f'filter_{column}_{title}'
+            selected_options = st.sidebar.multiselect(
+                f'Select {column}',
+                options=available_options,
+                default=available_options,
+                key=filter_key
+            )
+            
+            # Apply filter
+            filtered_df = filtered_df[filtered_df[column].isin(selected_options)]
         
-        filtered_df_jenis = df[df['JENIS SURVEI'].isin(jenis_survei_filter)]
-        
-        available_tipe_questions = filtered_df_jenis['TIPE QUESTION'].unique().tolist()
-        tipe_question_filter = st.sidebar.multiselect(
-            'Select Fungsi',
-            options=available_tipe_questions,
-            default=available_tipe_questions,
-            key='tipe_question_filter'
-        )
-        
-        filtered_df_tipe = filtered_df_jenis[filtered_df_jenis['TIPE QUESTION'].isin(tipe_question_filter)]
-        
-        available_bidang = filtered_df_tipe['BIDANG'].unique().tolist()
-        bidang_filter = st.sidebar.multiselect(
-            'Select Bidang',
-            options=available_bidang,
-            default=available_bidang,
-            key='bidang_filter'
-        )
-        
-        filtered_df_bidang = filtered_df_tipe[filtered_df_tipe['BIDANG'].isin(bidang_filter)]
-        
-        available_satker = filtered_df_bidang['SATKER (AKRONIM)'].unique().tolist()
-        satker_filter = st.sidebar.multiselect(
-            'Select Satker',
-            options=available_satker,
-            default=available_satker,
-            key='satker_filter'
-        )
-        
-        filtered_df_satker = filtered_df_bidang[filtered_df_bidang['SATKER (AKRONIM)'].isin(satker_filter)]
-        
-        available_labels = filtered_df_satker['Label'].unique().tolist()
-        label_filter = st.sidebar.multiselect(
-            'Select Label',
-            options=available_labels,
-            default=available_labels,
-            key='label_filter'
-        )
-        
-        filtered_df = filtered_df_satker[filtered_df_satker['Label'].isin(label_filter)]
-        
-        open_questions_keywords = get_keyword_options(
+        # Keywords Filter for Open Questions
+        keywords = get_keyword_options(
             filtered_df, 
-            ['OPEN QUESTION 1', 'OPEN QUESTION 2'], 
+            open_question_columns, 
             stop_words
         )
         
-        open_questions_keyword_filter = st.sidebar.multiselect(
+        keyword_filter = st.sidebar.multiselect(
             'Keywords in Open Questions',
-            options=[kw[0] for kw in open_questions_keywords],
+            options=[kw[0] for kw in keywords],
             default=[],  
-            format_func=lambda x: f"{x} ({dict(open_questions_keywords)[x]} times)"
+            format_func=lambda x: f"{x} ({dict(keywords)[x]} times)"
         )
-       
-        if open_questions_keyword_filter:
+        
+        if keyword_filter:
             filtered_df = filtered_df[
                 filtered_df.apply(
                     lambda row: any(
-                        kw in extract_keywords(row['OPEN QUESTION 1'], stop_words) or 
-                        kw in extract_keywords(row['OPEN QUESTION 2'], stop_words) 
-                        for kw in open_questions_keyword_filter
+                        kw in extract_keywords(row[col], stop_words) 
+                        for col in open_question_columns 
+                        for kw in keyword_filter
                     ), 
                     axis=1
                 )
             ]
-            
+        
+        # Sentiment Analysis
         average_sentiment_weight = calculate_sentiment_weight(df)
         
+        # Metrics
         st.header('Survey Metrics')
         col2, col3 = st.columns(2)
-        
-        # with col1:
-        #     st.metric('Total Responses', filtered_df.shape[0])
         
         with col2:
             label_counts = filtered_df['Label'].value_counts()
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
          
         with col3:
-            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
-
+            st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight, 2):.2f}")
+        
+        # Visualizations
         st.header('Visualizations')
         
         col1, col2 = st.columns(2)
@@ -266,10 +225,9 @@ def internal_eksternal_page():
             )
             st.plotly_chart(label_count_fig)
         
+        # Detailed Data
         st.header('Detailed Data')
-        search_placeholder = "Search across all columns"
-
-        search_term = st.text_input('Search Tabel Query', placeholder=search_placeholder, key="search_input")
+        search_term = st.text_input('Search Tabel Query', placeholder="Search across all columns", key=f"search_input_{title}")
 
         if search_term:
             search_df = filtered_df[
@@ -281,10 +239,19 @@ def internal_eksternal_page():
         else:
             search_df = filtered_df
 
-        columns_to_exclude = ['New_Label','Confidence','NAMA PIC/RESPONDEN','EMAIL','KONTAK','EMAIL CADANGAN','KOTAK CADANGAN','Combined_Text']  
-        display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
+        # columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text']
+        # display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
+        
+        columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text']
+
+        if title == "Adjustment Factor 2 Open Question with Nilai Label (Real)":
+            columns_to_exclude.append('NILAI_SENTIMEN')
+            
+        if title == "Adjustment Factor 1 Open Question with Nilai Label (Real)":
+            columns_to_exclude.append('NILAI_SENTIMEN')
+
+        display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
         st.dataframe(display_df)
-        # st.dataframe(search_df)
         
         st.header('Word Analysis')
         verb_active_df = analyze_action_phrases(search_df)
@@ -302,42 +269,47 @@ def internal_eksternal_page():
             st.plotly_chart(top_words_fig)
         else:
             st.write("No verb or active words found in the filtered dataset.")
-
-        if open_questions_keyword_filter:
+        
+        # Keyword Analysis
+        if keyword_filter:
             st.header('Keyword Analysis')
             
             kw_freq_data = []
-            for kw in open_questions_keyword_filter:
-                oq1_count = filtered_df['OPEN QUESTION 1'].apply(
-                    lambda x: kw in extract_keywords(x, stop_words)
-                ).sum()
-                oq2_count = filtered_df['OPEN QUESTION 2'].apply(
-                    lambda x: kw in extract_keywords(x, stop_words)
-                ).sum()
+            for kw in keyword_filter:
+                kw_freq_row = {'Keyword': kw}
+                for col in open_question_columns:
+                    count = filtered_df[col].apply(
+                        lambda x: kw in extract_keywords(x, stop_words)
+                    ).sum()
+                    kw_freq_row[f'{col} Count'] = count
                 
-                kw_freq_data.append({
-                    'Keyword': kw,
-                    'Open Question 1 Count': oq1_count,
-                    'Open Question 2 Count': oq2_count
-                })
+                kw_freq_data.append(kw_freq_row)
             
             kw_freq_df = pd.DataFrame(kw_freq_data)
-            
             st.dataframe(kw_freq_df, use_container_width=True)
             
-            fig = go.Figure(data=[
-                go.Bar(name='Open Question 1', x=kw_freq_df['Keyword'], y=kw_freq_df['Open Question 1 Count']),
-                go.Bar(name='Open Question 2', x=kw_freq_df['Keyword'], y=kw_freq_df['Open Question 2 Count'])
-            ])
+            # Keyword Frequency Bar Chart
+            bar_data = []
+            for col in open_question_columns:
+                bar_data.append(
+                    go.Bar(
+                        name=col, 
+                        x=kw_freq_df['Keyword'], 
+                        y=kw_freq_df[f'{col} Count']
+                    )
+                )
+            
+            fig = go.Figure(data=bar_data)
             fig.update_layout(barmode='group', title='Keyword Frequencies in Open Questions')
             st.plotly_chart(fig)
     
     else:
         st.warning('No data loaded. Please check the data file path.')
+
         
 def idi_page():
     st.title('IDI Survey Data Dashboard')
-    idi_df = load_data('data/hasil/main_data_idi (1).csv')
+    idi_df = load_data('data/hasil/main_data_idi_sentimen.csv')
     
     if not idi_df.empty:
         
@@ -445,7 +417,7 @@ def idi_page():
         else:
             search_df = filtered_df
 
-        columns_to_exclude = ['New_Label','Confidence']  
+        columns_to_exclude = ['New_Label','Confidence','NILAI_SENTIMEN']  
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
         st.dataframe(display_df)
 
@@ -509,15 +481,54 @@ def idi_page():
         st.warning('No IDI data loaded. Please check the data file path.')
 
 pages = {
-    "INTERNAL-EKSTERNAL": internal_eksternal_page,
+    "INTERNAL-EKSTERNAL": create_survey_dashboard,
     "IDI Dashboard": idi_page
 }
 
 def main():
+    try:
+        stop_words = set(stopwords.words('indonesian'))
+    except LookupError:
+        nltk.download('stopwords', quiet=True)
+        stop_words = set(stopwords.words('indonesian'))
+    
+    st.sidebar.title("Navigation")
+    
+    datasets = {
+        "Adjustment Factor 2 Open Question (Passing Nilai)": {
+            'path': 'data/hasil/main_data.csv',
+            'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
+        },
+        "Adjustment Factor 1 Open Question (Passing Nilai)": {
+            'path': 'data/hasil/main_data_REVREV.csv',
+            'open_questions': ['OPEN QUESTION 1']
+        },
+        "Adjustment Factor 2 Open Question with Nilai Label (Real)": {
+            'path': 'data/hasil/main_data.csv',
+            'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
+        },
+        "Adjustment Factor 1 Open Question with Nilai Label (Real)": {
+            'path': 'data/hasil/main_data_REVREV.csv',
+            'open_questions': ['OPEN QUESTION 1']
+        }
+    }
+    
     st.sidebar.title("Navigation")
     page = st.sidebar.selectbox("Select a Page", list(pages.keys()))
     
-    pages[page]()
+    if page == "IDI Dashboard":
+        pages[page]()
+    else:
+        data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
+        dataset_info = datasets[data]
+        df = load_data(dataset_info['path'])
+        
+        pages[page](
+            df, 
+            data, 
+            stop_words, 
+            dataset_info['open_questions']
+        )
 
 if __name__ == '__main__':
     main()
