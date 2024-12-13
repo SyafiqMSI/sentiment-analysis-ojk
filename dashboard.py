@@ -215,7 +215,10 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         )
         
         st.header('Survey Metrics')
-        col2, col3 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric('Total Responses', filtered_df.shape[0])
         
         with col2:
             label_counts = filtered_df['Label'].value_counts()
@@ -273,10 +276,10 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         
         columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text']
 
-        if title == "Adjustment Factor 2 Open Question dengan nilai real":
+        if title == "Confirmation Factor 2 Open Question dengan nilai real":
             columns_to_exclude.append('NILAI_SENTIMEN')
             
-        if title == "Adjustment Factor 1 Open Question dengan nilai real":
+        if title == "Confirmation Factor 1 Open Question dengan nilai real":
             columns_to_exclude.append('NILAI_SENTIMEN')
 
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
@@ -339,11 +342,7 @@ def idi_page():
     idi_df = load_data('data/hasil/main_data_idi_sentimen.csv')
     
     if not idi_df.empty:
-        filter_columns = {
-            'Jenis': jenis_filter,
-            'Label': label_filter
-        }
-        
+     
         try:
             stop_words = set(stopwords.words('indonesian'))
         except LookupError:
@@ -351,6 +350,8 @@ def idi_page():
             stop_words = set(stopwords.words('indonesian'))
         
         st.sidebar.header('Cascading Filters')
+        
+        idi_df['Title'] = 'IDI Survey Dashboard'
         
         jenis_filter = st.sidebar.multiselect(
             'Select Jenis',
@@ -370,6 +371,11 @@ def idi_page():
         )
         
         filtered_df = filtered_df_jenis[filtered_df_jenis['Label'].isin(label_filter)]
+
+        filter_columns = {
+            'Jenis': jenis_filter,
+            'Label': label_filter
+        }
         
         idi_keywords = get_keyword_options(
             filtered_df, 
@@ -404,7 +410,10 @@ def idi_page():
         )
         
         st.header('Survey Metrics')
-        col2, col3 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric('Total Responses', filtered_df.shape[0])
         
         with col2:
             label_counts = filtered_df['Label'].value_counts()
@@ -540,11 +549,11 @@ def main():
             'path': 'data/hasil/main_data_REVREV.csv',
             'open_questions': ['OPEN QUESTION 1']
         },
-        "Adjustment Factor 2 Open Question dengan nilai real": {
+        "Confirmation Factor 2 Open Question dengan nilai real": {
             'path': 'data/hasil/main_data.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
-        "Adjustment Factor 1 Open Question dengan nilai real": {
+        "Confirmation Factor 1 Open Question dengan nilai real": {
             'path': 'data/hasil/main_data_REVREV.csv',
             'open_questions': ['OPEN QUESTION 1']
         }
