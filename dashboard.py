@@ -138,7 +138,7 @@ def calculate_sentiment_weight(df, filter_columns=None):
         else:
             return None
     
-    if 'pembulatan' in df['Title'].iloc[0]:
+    if 'Adjustment' in df['Title'].iloc[0]:
         filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index'].apply(calculate_weight)
     else:
         filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index']
@@ -227,9 +227,9 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         with col3:
             if filtered_df.empty:
                 average_sentiment_weight = 0  
-            if title == "Adjustment Factor 2 Open Question dengan pembulatan":
+            if title == "Adjustment Factor 2 Open Question":
                 st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
-            elif title == "Adjustment Factor 1 Open Question dengan pembulatan":
+            elif title == "Adjustment Factor 1 Open Question":
                 st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
             else:
                 st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
@@ -274,12 +274,12 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         # columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text']
         # display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
         
-        columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text']
+        columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text', 'Text', 'Title']
 
-        if title == "Confirmation Factor 2 Open Question dengan nilai real":
+        if title == "Confirmation Factor 2 Open Question":
             columns_to_exclude.append('NILAI_SENTIMEN')
             
-        if title == "Confirmation Factor 1 Open Question dengan nilai real":
+        if title == "Confirmation Factor 1 Open Question":
             columns_to_exclude.append('NILAI_SENTIMEN')
 
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
@@ -541,19 +541,19 @@ def main():
     st.sidebar.title("Navigation")
     
     datasets = {
-        "Adjustment Factor 2 Open Question dengan pembulatan": {
+        "Adjustment Factor 2 Open Question": {
             'path': 'data/hasil/main_data.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
-        "Adjustment Factor 1 Open Question dengan pembulatan": {
+        "Adjustment Factor 1 Open Question": {
             'path': 'data/hasil/main_data_REVREV.csv',
             'open_questions': ['OPEN QUESTION 1']
         },
-        "Confirmation Factor 2 Open Question dengan nilai real": {
+        "Confirmation Factor 2 Open Question": {
             'path': 'data/hasil/main_data.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
-        "Confirmation Factor 1 Open Question dengan nilai real": {
+        "Confirmation Factor 1 Open Question": {
             'path': 'data/hasil/main_data_REVREV.csv',
             'open_questions': ['OPEN QUESTION 1']
         }
