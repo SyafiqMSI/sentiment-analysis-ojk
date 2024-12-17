@@ -140,6 +140,8 @@ def calculate_sentiment_weight(df, filter_columns=None):
     
     if 'Adjustment' in df['Title'].iloc[0]:
         filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index'].apply(calculate_weight)
+    elif 'IDI Survey' in df['Title'].iloc[0]:
+        filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index'].apply(calculate_weight)
     else:
         filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index']
     
@@ -463,7 +465,7 @@ def idi_page():
         else:
             search_df = filtered_df
 
-        columns_to_exclude = ['New_Label','Confidence']  
+        columns_to_exclude = ['New_Label','Confidence','Title']  
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
         st.dataframe(display_df)
 
