@@ -463,7 +463,7 @@ def idi_page():
         else:
             search_df = filtered_df
 
-        columns_to_exclude = ['New_Label','Confidence','NILAI_SENTIMEN']  
+        columns_to_exclude = ['New_Label','Confidence']  
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
         st.dataframe(display_df)
 
