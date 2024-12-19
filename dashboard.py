@@ -218,14 +218,14 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         
         st.header('Survey Metrics')
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             st.metric('Total Responses', filtered_df.shape[0])
-        
+
         with col2:
             label_counts = filtered_df['Label'].value_counts()
             st.metric('Dominant Label', label_counts.index[0] if len(label_counts) > 0 else 'N/A')
-         
+            
         with col3:
             if filtered_df.empty:
                 average_sentiment_weight = 0  
@@ -233,6 +233,12 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
                 st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
             elif title == "Adjustment Factor 1 Open Question":
                 st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
+            elif title == "Gabungan":
+                if 'AF_AVERAGE' in filtered_df.columns:
+                    af_average = filtered_df['AF_AVERAGE'].mean()
+                    st.metric('Nilai Rata-rata AF', f"{af_average:.2f}")
+                else:
+                    st.metric('Nilai Rata-rata AF', 'N/A')
             else:
                 st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
 
@@ -543,6 +549,10 @@ def main():
     st.sidebar.title("Navigation")
     
     datasets = {
+        "Gabungan": {
+            'path': 'data/hasil/hasil_gabungan.csv',
+            'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
+        },
         "Adjustment Factor 2 Open Question": {
             'path': 'data/hasil/main_data_17_OQ2_dashboard.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
