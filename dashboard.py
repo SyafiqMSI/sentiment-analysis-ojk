@@ -149,6 +149,8 @@ def calculate_sentiment_weight(df, filter_columns=None):
     
     return average_bobot_sentimen
 
+Title = "ojk1103"
+
 def create_survey_dashboard(df, title, stop_words, open_question_columns):
     
     df['Title'] = title
@@ -344,7 +346,8 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
     else:
         st.warning('No data loaded. Please check the data file path.')
 
-        
+Path = "ojk1103"
+
 def idi_page():
     st.title('IDI Survey Data Dashboard')
     idi_df = load_data('data/hasil/main_data_idi_sentimen.csv')
@@ -539,14 +542,64 @@ pages = {
     "IDI Dashboard": idi_page
 }
 
+def login():
+    st.markdown("""
+        <style>
+        @media screen and (max-width: 640px) {
+            .hide-mobile {
+                display: none !important;
+            }
+        }
+        </style>
+    """, unsafe_allow_html=True)
+     
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.markdown("""
+            <div style='padding: 20px; 
+                        border-radius: 10px;
+                        height: 350px;
+                        max-hight: 100vh;
+                        margin-top: 50px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;' class="hide-mobile">
+                <h1 style='text-align: center'>Sentiment Analysis</h1>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+            <div style='padding: 20px; 
+                        margin-top: 50px;
+                        border-radius: 10px;
+                        max-hight: 100vh;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                <h2 style='text-align: center;'>Login</h2>
+                <p style='text-align: center'>Survey Kepuasan Stakeholder OJK 2024</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        st.write("")
+        
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        
+        col2_1, col2_2, col2_3 = st.columns([1,1,1])
+        with col2_2:
+            if st.button("Login", use_container_width=True):
+                if username == Path and password == Title:
+                    st.session_state['logged_in'] = True
+                else:
+                    st.error("Invalid username or password")
+                    
 def main():
     try:
         stop_words = set(stopwords.words('indonesian'))
     except LookupError:
         nltk.download('stopwords', quiet=True)
         stop_words = set(stopwords.words('indonesian'))
-    
-    st.sidebar.title("Navigation")
     
     datasets = {
         "Gabungan": {
@@ -571,22 +624,31 @@ def main():
         }
     }
     
-    st.sidebar.title("Navigation")
-    page = st.sidebar.selectbox("Select a Page", list(pages.keys()))
-    
-    if page == "IDI Dashboard":
-        pages[page]()
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+    if not st.session_state['logged_in']:
+        login()
     else:
-        data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
-        dataset_info = datasets[data]
-        df = load_data(dataset_info['path'])
+        st.sidebar.title("Navigation")
+        page = st.sidebar.selectbox("Select a Page", list(pages.keys()))
         
-        pages[page](
-            df, 
-            data, 
-            stop_words, 
-            dataset_info['open_questions']
-        )
+        if page == "IDI Dashboard":
+            pages[page]()
+        else:
+            data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
+            dataset_info = datasets[data]
+            df = load_data(dataset_info['path'])
+            
+            pages[page](
+                df, 
+                data, 
+                stop_words, 
+                dataset_info['open_questions']
+            )
+            
+        if st.sidebar.button("Logout"):
+            st.session_state['logged_in'] = False
 
 if __name__ == '__main__':
     main()
