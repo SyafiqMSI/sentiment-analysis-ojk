@@ -554,19 +554,19 @@ def main():
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
         "Adjustment Factor 2 Open Question": {
-            'path': 'data/hasil/main_data_17_OQ2_dashboard.csv',
+            'path': 'data/hasil/main_data_19_OQ2_dashboard.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
         "Adjustment Factor 1 Open Question": {
-            'path': 'data/hasil/main_data_17_OQ1_dashboard.csv',
+            'path': 'data/hasil/main_data_19_OQ1_dashboard.csv',
             'open_questions': ['OPEN QUESTION 1']
         },
         "Confirmation Factor 2 Open Question": {
-            'path': 'data/hasil/main_data_17_OQ2_dashboard.csv',
+            'path': 'data/hasil/main_data_19_OQ2_dashboard.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
         "Confirmation Factor 1 Open Question": {
-            'path': 'data/hasil/main_data_17_OQ1_dashboard.csv',
+            'path': 'data/hasil/main_data_19_OQ1_dashboard.csv',
             'open_questions': ['OPEN QUESTION 1']
         }
     }
