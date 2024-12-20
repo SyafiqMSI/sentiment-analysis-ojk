@@ -103,7 +103,7 @@ def analyze_action_phrases(df):
     
     return pd.DataFrame(phrase_data)
 
-def calculate_sentiment_weight(df, filter_columns=None):
+def calculate_sentiment_weight(df, filter_columns=None, is_idi_cf=False):
     if df.empty:
         return 0
     
@@ -140,16 +140,16 @@ def calculate_sentiment_weight(df, filter_columns=None):
     
     if 'Adjustment' in df['Title'].iloc[0]:
         filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index'].apply(calculate_weight)
+    elif is_idi_cf:
+        filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index']
     elif 'IDI Survey' in df['Title'].iloc[0]:
         filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index'].apply(calculate_weight)
     else:
         filtered_df['NILAI_SENTIMEN'] = filtered_df['Label_Index']
-    
+
     average_bobot_sentimen = filtered_df['NILAI_SENTIMEN'].mean()
     
     return average_bobot_sentimen
-
-Title = "ojk1103"
 
 def create_survey_dashboard(df, title, stop_words, open_question_columns):
     
@@ -346,10 +346,9 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
     else:
         st.warning('No data loaded. Please check the data file path.')
 
-Path = "ojk1103"
-
-def idi_page():
-    st.title('IDI Survey Data Dashboard')
+        
+def idi_page(data):
+    st.title(data)
     idi_df = load_data('data/hasil/main_data_idi_sentimen.csv')
     
     if not idi_df.empty:
@@ -415,10 +414,17 @@ def idi_page():
                 )
             ]
         
-        average_sentiment_weight_idi = calculate_sentiment_weight(
-            idi_df, 
-            filter_columns
-        )
+        if data == 'Confirmation Factor':
+            average_sentiment_weight_idi = calculate_sentiment_weight(
+                idi_df, 
+                filter_columns,
+                True
+            )
+        else:
+            average_sentiment_weight_idi = calculate_sentiment_weight(
+                idi_df, 
+                filter_columns
+            )
         
         st.header('Survey Metrics')
         col1, col2, col3 = st.columns(3)
@@ -434,7 +440,10 @@ def idi_page():
             if filtered_df.empty:
                 average_sentiment_weight = 0  
             else: 
-                st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight_idi):.2f}")
+                if data == 'Confirmation Factor':
+                    st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight_idi):.2f}")
+                else: 
+                    st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight_idi):.2f}")
 
         st.header('Visualizations')
         
@@ -475,7 +484,10 @@ def idi_page():
             search_df = filtered_df
 
         columns_to_exclude = ['New_Label','Confidence','Title']  
-        display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')  
+        display_df = search_df.drop(columns=columns_to_exclude, errors='ignore') 
+        
+        if data == 'Confirmation Factor':
+            display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
         st.dataframe(display_df)
 
         st.header('Word Analysis')
@@ -542,64 +554,14 @@ pages = {
     "IDI Dashboard": idi_page
 }
 
-def login():
-    st.markdown("""
-        <style>
-        @media screen and (max-width: 640px) {
-            .hide-mobile {
-                display: none !important;
-            }
-        }
-        </style>
-    """, unsafe_allow_html=True)
-     
-    col1, col2 = st.columns([1, 2])
-    
-    with col1:
-        st.markdown("""
-            <div style='padding: 20px; 
-                        border-radius: 10px;
-                        height: 350px;
-                        max-hight: 100vh;
-                        margin-top: 50px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;' class="hide-mobile">
-                <h1 style='text-align: center'>Sentiment Analysis</h1>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-            <div style='padding: 20px; 
-                        margin-top: 50px;
-                        border-radius: 10px;
-                        max-hight: 100vh;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
-                <h2 style='text-align: center;'>Login</h2>
-                <p style='text-align: center'>Survey Kepuasan Stakeholder OJK 2024</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        st.write("")
-        
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        
-        col2_1, col2_2, col2_3 = st.columns([1,1,1])
-        with col2_2:
-            if st.button("Login", use_container_width=True):
-                if username == Path and password == Title:
-                    st.session_state['logged_in'] = True
-                else:
-                    st.error("Invalid username or password")
-                    
 def main():
     try:
         stop_words = set(stopwords.words('indonesian'))
     except LookupError:
         nltk.download('stopwords', quiet=True)
         stop_words = set(stopwords.words('indonesian'))
+    
+    st.sidebar.title("Navigation")
     
     datasets = {
         "Gabungan": {
@@ -623,32 +585,24 @@ def main():
             'open_questions': ['OPEN QUESTION 1']
         }
     }
-    
-    if 'logged_in' not in st.session_state:
-        st.session_state['logged_in'] = False
 
-    if not st.session_state['logged_in']:
-        login()
+    st.sidebar.title("Navigation")
+    page = st.sidebar.selectbox("Select a Page", list(pages.keys()))
+    
+    if page == "IDI Dashboard":
+        data = st.sidebar.selectbox("Select a Dataset", ['Adjusment Factor', 'Confirmation Factor'])
+        pages[page](data)
     else:
-        st.sidebar.title("Navigation")
-        page = st.sidebar.selectbox("Select a Page", list(pages.keys()))
+        data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
+        dataset_info = datasets[data]
+        df = load_data(dataset_info['path'])
         
-        if page == "IDI Dashboard":
-            pages[page]()
-        else:
-            data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
-            dataset_info = datasets[data]
-            df = load_data(dataset_info['path'])
-            
-            pages[page](
-                df, 
-                data, 
-                stop_words, 
-                dataset_info['open_questions']
-            )
-            
-        if st.sidebar.button("Logout"):
-            st.session_state['logged_in'] = False
+        pages[page](
+            df, 
+            data, 
+            stop_words, 
+            dataset_info['open_questions']
+        )
 
 if __name__ == '__main__':
     main()
