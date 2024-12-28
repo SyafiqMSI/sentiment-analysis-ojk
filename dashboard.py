@@ -234,9 +234,9 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
             if filtered_df.empty:
                 average_sentiment_weight = 0  
             if title == "Adjustment Factor 2 Open Question":
-                st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
+                st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.3f}")
             elif title == "Adjustment Factor 1 Open Question":
-                st.metric('Nilai Bobot Sentimen', f"{round(average_sentiment_weight):.2f}")
+                st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.3f}")
             elif title == "Gabungan":
                 if 'AF_AVERAGE' in filtered_df.columns:
                     af_average = filtered_df['AF_AVERAGE'].mean()
