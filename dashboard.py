@@ -356,7 +356,7 @@ def kojk_page(data):
     
     datasets1 = {
         "Gabungan": {
-            'path': 'data/hasil/hasil_gabungan_kojk.csv',
+            'path': 'data/hasil/hasil_gabungan_KOJK.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
         "Adjustment Factor 2 Open Question": {
