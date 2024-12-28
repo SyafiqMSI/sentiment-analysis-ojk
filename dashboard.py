@@ -355,15 +355,27 @@ def kojk_page(data):
     st.title(data)
     
     datasets1 = {
-        "KOJK Adjustment Factor": {
-            'path': 'data/hasil/main_data_28_KOJK_OQ2_dashboard.csv',  # Sesuaikan dengan path file yang benar
+        "Gabungan": {
+            'path': 'data/hasil/hasil_gabungan_kojk.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
         },
-        "KOJK Confirmation Factor": {
-            'path': 'data/hasil/main_data_28_KOJK_OQ2_dashboard.csv',  # Sesuaikan dengan path file yang benar
+        "Adjustment Factor 2 Open Question": {
+            'path': 'data/hasil/main_data_28_KOJK_OQ2_dashboard.csv',
             'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
+        },
+        "Adjustment Factor 1 Open Question": {
+            'path': 'data/hasil/main_data_28_KOJK_OQ1_dashboard.csv',
+            'open_questions': ['OPEN QUESTION 1']
+        },
+        "Confirmation Factor 2 Open Question": {
+            'path': 'data/hasil/main_data_28_KOJK_OQ2_dashboard.csv',
+            'open_questions': ['OPEN QUESTION 1', 'OPEN QUESTION 2']
+        },
+        "Confirmation Factor 1 Open Question": {
+            'path': 'data/hasil/main_data_28_KOJK_OQ1_dashboard.csv',
+            'open_questions': ['OPEN QUESTION 1']
         }
-        }
+    }
     
     if data in datasets1:
         df = load_data(datasets1[data]['path'])
@@ -379,7 +391,9 @@ def kojk_page(data):
             st.sidebar.header('Cascading Filters')
             
             filter_columns = [
-                col for col in ['JENIS SURVEI', 'TIPE QUESTION', 'BIDANG', 'SATKER (AKRONIM)', 'Label'] 
+                col for col in ['JENIS SURVEI', 'TIPE QUESTION', 
+                                # 'BIDANG',
+                                'SATKER (AKRONIM)', 'Label'] 
                 if col in df.columns
             ]
             
@@ -489,6 +503,15 @@ def kojk_page(data):
 
             columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text', 'Text', 'Title']
             display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
+            
+            if data == 'Confirmation Factor':
+                display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
+            
+            if data == "Confirmation Factor 2 Open Question":
+                display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
+            
+            if data == "Confirmation Factor 1 Open Question":
+                display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
             st.dataframe(display_df)
             
             # Word Analysis Section
@@ -847,9 +870,13 @@ def main():
         
         if page == "IDI Dashboard":
             data = st.sidebar.selectbox("Select a Dataset", ['Adjusment Factor', 'Confirmation Factor'])
-            pages[page](data)
+            pages[page](
+                data,
+                stop_words, 
+                dataset_info['open_questions']
+                )
         elif page == "KOJK Dashboard":
-            data = st.sidebar.selectbox("Select a Dataset", ['KOJK Adjustment Factor', 'KOJK Confirmation Factor'])
+            data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
             pages[page](data)
         else:
             data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
