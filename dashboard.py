@@ -391,9 +391,11 @@ def kojk_page(data):
             st.sidebar.header('Cascading Filters')
             
             filter_columns = [
-                col for col in ['JENIS SURVEI', 'TIPE QUESTION', 
-                                # 'BIDANG',
-                                'SATKER (AKRONIM)', 'Label'] 
+                col for col in [
+                    # 'JENIS SURVEI',
+                    'TIPE QUESTION', 
+                    # 'BIDANG',
+                    'SATKER (AKRONIM)', 'Label'] 
                 if col in df.columns
             ]
             
@@ -462,7 +464,7 @@ def kojk_page(data):
             with col3:
                 if filtered_df.empty:
                     average_sentiment_weight = 0
-                st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.2f}")
+                st.metric('Nilai Bobot Sentimen', f"{average_sentiment_weight:.3f}")
 
             # Visualizations Section
             st.header('Visualizations')
@@ -860,7 +862,7 @@ def main():
     }
 
     if 'logged_in' not in st.session_state:
-        st.session_state['logged_in'] = True
+        st.session_state['logged_in'] = False
 
     if not st.session_state['logged_in']:
         login()
