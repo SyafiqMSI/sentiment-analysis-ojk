@@ -351,8 +351,8 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         
 Path = "ojk1103"
         
-def kojk_page(data):
-    st.title(data)
+def kojk_page(data1):
+    st.title(data1)
     
     datasets1 = {
         "Gabungan": {
@@ -377,8 +377,8 @@ def kojk_page(data):
         }
     }
     
-    if data in datasets1:
-        df = load_data(datasets1[data]['path'])
+    if data1 in datasets1:
+        df = load_data(datasets1[data1]['path'])
         
         try:
             stop_words = set(stopwords.words('indonesian'))
@@ -387,7 +387,7 @@ def kojk_page(data):
             stop_words = set(stopwords.words('indonesian'))
             
         if not df.empty:
-            df['Title'] = data
+            df['Title'] = data1
             st.sidebar.header('Cascading Filters')
             
             filter_columns = [
@@ -405,7 +405,7 @@ def kojk_page(data):
             for i, column in enumerate(filter_columns):
                 available_options = filtered_df[column].unique().tolist()
                 
-                filter_key = f'filter_{column}_{data}'
+                filter_key = f'filter_{column}_{data1}'
                 selected_options = st.sidebar.multiselect(
                     f'Select {column}',
                     options=available_options,
@@ -418,7 +418,7 @@ def kojk_page(data):
             
             keywords = get_keyword_options(
                 filtered_df, 
-                datasets1[data]['open_questions'], 
+                datasets1[data1]['open_questions'], 
                 stop_words
             )
             
@@ -434,7 +434,7 @@ def kojk_page(data):
                     filtered_df.apply(
                         lambda row: any(
                             kw in extract_keywords(row[col], stop_words) 
-                            for col in datasets1[data]['open_questions'] 
+                            for col in datasets1[data1]['open_questions'] 
                             for kw in keyword_filter
                         ), 
                         axis=1
@@ -491,7 +491,7 @@ def kojk_page(data):
             
             # Detailed Data Section
             st.header('Detailed Data')
-            search_term = st.text_input('Search Tabel Query', placeholder="Search across all columns", key=f"search_input_{data}")
+            search_term = st.text_input('Search Tabel Query', placeholder="Search across all columns", key=f"search_input_{data1}")
 
             if search_term:
                 search_df = filtered_df[
@@ -506,13 +506,13 @@ def kojk_page(data):
             columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text', 'Text', 'Title']
             display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
             
-            if data == 'Confirmation Factor':
+            if data1 == 'Confirmation Factor':
                 display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
             
-            if data == "Confirmation Factor 2 Open Question":
+            if data1 == "Confirmation Factor 2 Open Question":
                 display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
             
-            if data == "Confirmation Factor 1 Open Question":
+            if data1 == "Confirmation Factor 1 Open Question":
                 display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
             st.dataframe(display_df)
             
@@ -541,7 +541,7 @@ def kojk_page(data):
                 kw_freq_data = []
                 for kw in keyword_filter:
                     kw_freq_row = {'Keyword': kw}
-                    for col in datasets1[data]['open_questions']:
+                    for col in datasets1[data1]['open_questions']:
                         count = filtered_df[col].apply(
                             lambda x: kw in extract_keywords(x, stop_words)
                         ).sum()
@@ -553,7 +553,7 @@ def kojk_page(data):
                 st.dataframe(kw_freq_df, use_container_width=True)
                 
                 bar_data = []
-                for col in datasets1[data]['open_questions']:
+                for col in datasets1[data1]['open_questions']:
                     bar_data.append(
                         go.Bar(
                             name=col, 
@@ -872,14 +872,10 @@ def main():
         
         if page == "IDI Dashboard":
             data = st.sidebar.selectbox("Select a Dataset", ['Adjusment Factor', 'Confirmation Factor'])
-            pages[page](
-                data,
-                stop_words, 
-                dataset_info['open_questions']
-                )
-        elif page == "KOJK Dashboard":
-            data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
             pages[page](data)
+        elif page == "KOJK Dashboard":
+            data1 = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
+            pages[page](data1)
         else:
             data = st.sidebar.selectbox("Select a Dataset", list(datasets.keys()))
             dataset_info = datasets[data]
