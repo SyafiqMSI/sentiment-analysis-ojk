@@ -153,6 +153,258 @@ def calculate_sentiment_weight(df, filter_columns=None, is_idi_cf=False):
 
 Title = "ojk1103"
 
+def display_topic_analysis(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2.csv', sep=';')
+        
+        # Menampilkan tabel dengan format yang lebih baik
+        st.subheader('Verb-Noun Pairs Analysis')
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Menyesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+        
+def display_topic_analysis_kojk(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_KOJKOQ2.csv', sep=';')
+        
+        # Menampilkan tabel dengan format yang lebih baik
+        st.subheader('Verb-Noun Pairs Analysis')
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Menyesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+        
+def display_topic_analysis_idi(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_idi_OQ2.csv', sep=';')
+        
+        # Menampilkan tabel dengan format yang lebih baik
+        st.subheader('Verb-Noun Pairs Analysis')
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Menyesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+
 def create_survey_dashboard(df, title, stop_words, open_question_columns):
     
     df['Title'] = title
@@ -187,7 +439,7 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
             filtered_df = filtered_df[filtered_df[column].isin(selected_options)]
         
         keywords = get_keyword_options(
-            filtered_df, 
+            filtered_df,
             open_question_columns, 
             stop_words
         )
@@ -297,62 +549,64 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
         st.dataframe(display_df)
         
-        st.header('Word Analysis')
-        verb_active_df = analyze_action_phrases(search_df)
+        verb_active_df = analyze_action_phrases(search_df)  # Gunakan fungsi analyze_action_phrases
         
-        if not verb_active_df.empty:
-            st.dataframe(verb_active_df, use_container_width=True)
-            
-            st.subheader('Top Words')
-            top_words_fig = px.bar(
-                verb_active_df.head(10), 
-                x='keyword', 
-                y='jumlah', 
-                title='Top 10 Words'
-            )
-            st.plotly_chart(top_words_fig)
-        else:
-            st.write("No verb or active words found in the filtered dataset.")
+        # Tampilkan topic analysis secara terpisah
+        display_topic_analysis(search_df)
         
-        if keyword_filter:
-            st.header('Keyword Analysis')
+        # # Lanjutkan dengan analisis verb active
+        # if not verb_active_df.empty:
+        #     st.dataframe(verb_active_df, use_container_width=True)
             
-            kw_freq_data = []
-            for kw in keyword_filter:
-                kw_freq_row = {'Keyword': kw}
-                for col in open_question_columns:
-                    count = filtered_df[col].apply(
-                        lambda x: kw in extract_keywords(x, stop_words)
-                    ).sum()
-                    kw_freq_row[f'{col} Count'] = count
+        #     st.subheader('Top Words')
+        #     top_words_fig = px.bar(
+        #         verb_active_df.head(10), 
+        #         x='keyword', 
+        #         y='jumlah', 
+        #         title='Top 10 Words'
+        #     )
+        #     st.plotly_chart(top_words_fig)
+        # else:
+        #     st.write("No verb or active words found in the filtered dataset.")
+        
+        # if keyword_filter:
+        #     st.header('Keyword Analysis')
+            
+        #     kw_freq_data = []
+        #     for kw in keyword_filter:
+        #         kw_freq_row = {'Keyword': kw}
+        #         for col in open_question_columns:
+        #             count = filtered_df[col].apply(
+        #                 lambda x: kw in extract_keywords(x, stop_words)
+        #             ).sum()
+        #             kw_freq_row[f'{col} Count'] = count
                 
-                kw_freq_data.append(kw_freq_row)
+        #         kw_freq_data.append(kw_freq_row)
             
-            kw_freq_df = pd.DataFrame(kw_freq_data)
-            st.dataframe(kw_freq_df, use_container_width=True)
+        #     kw_freq_df = pd.DataFrame(kw_freq_data)
+        #     st.dataframe(kw_freq_df, use_container_width=True)
             
-            bar_data = []
-            for col in open_question_columns:
-                bar_data.append(
-                    go.Bar(
-                        name=col, 
-                        x=kw_freq_df['Keyword'], 
-                        y=kw_freq_df[f'{col} Count']
-                    )
-                )
+        #     bar_data = []
+        #     for col in open_question_columns:
+        #         bar_data.append(
+        #             go.Bar(
+        #                 name=col, 
+        #                 x=kw_freq_df['Keyword'], 
+        #                 y=kw_freq_df[f'{col} Count']
+        #             )
+        #         )
             
-            fig = go.Figure(data=bar_data)
-            fig.update_layout(barmode='group', title='Keyword Frequencies in Open Questions')
-            st.plotly_chart(fig)
-    
+        #     fig = go.Figure(data=bar_data)
+        #     fig.update_layout(barmode='group', title='Keyword Frequencies in Open Questions')
+        #     st.plotly_chart(fig)
     else:
         st.warning('No data loaded. Please check the data file path.')
-
+        
         
 Path = "ojk1103"
         
-def kojk_page(data1):
-    st.title(data1)
+def kojk_page(data):
+    st.title(data)
     
     datasets1 = {
         "Gabungan": {
@@ -377,8 +631,8 @@ def kojk_page(data1):
         }
     }
     
-    if data1 in datasets1:
-        df = load_data(datasets1[data1]['path'])
+    if data in datasets1:
+        df = load_data(datasets1[data]['path'])
         
         try:
             stop_words = set(stopwords.words('indonesian'))
@@ -387,7 +641,7 @@ def kojk_page(data1):
             stop_words = set(stopwords.words('indonesian'))
             
         if not df.empty:
-            df['Title'] = data1
+            df['Title'] = data
             st.sidebar.header('Cascading Filters')
             
             filter_columns = [
@@ -405,7 +659,7 @@ def kojk_page(data1):
             for i, column in enumerate(filter_columns):
                 available_options = filtered_df[column].unique().tolist()
                 
-                filter_key = f'filter_{column}_{data1}'
+                filter_key = f'filter_{column}_{data}'
                 selected_options = st.sidebar.multiselect(
                     f'Select {column}',
                     options=available_options,
@@ -418,7 +672,7 @@ def kojk_page(data1):
             
             keywords = get_keyword_options(
                 filtered_df, 
-                datasets1[data1]['open_questions'], 
+                datasets1[data]['open_questions'], 
                 stop_words
             )
             
@@ -434,7 +688,7 @@ def kojk_page(data1):
                     filtered_df.apply(
                         lambda row: any(
                             kw in extract_keywords(row[col], stop_words) 
-                            for col in datasets1[data1]['open_questions'] 
+                            for col in datasets1[data]['open_questions'] 
                             for kw in keyword_filter
                         ), 
                         axis=1
@@ -491,7 +745,7 @@ def kojk_page(data1):
             
             # Detailed Data Section
             st.header('Detailed Data')
-            search_term = st.text_input('Search Tabel Query', placeholder="Search across all columns", key=f"search_input_{data1}")
+            search_term = st.text_input('Search Tabel Query', placeholder="Search across all columns", key=f"search_input_{data}")
 
             if search_term:
                 search_df = filtered_df[
@@ -506,65 +760,64 @@ def kojk_page(data1):
             columns_to_exclude = ['New_Label', 'Confidence', 'NAMA PIC/RESPONDEN', 'EMAIL', 'KONTAK', 'EMAIL CADANGAN', 'KOTAK CADANGAN', 'Combined_Text', 'Text', 'Title']
             display_df = search_df.drop(columns=columns_to_exclude, errors='ignore')
             
-            if data1 == 'Confirmation Factor':
+            if data == 'Confirmation Factor':
                 display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
             
-            if data1 == "Confirmation Factor 2 Open Question":
+            if data == "Confirmation Factor 2 Open Question":
                 display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
             
-            if data1 == "Confirmation Factor 1 Open Question":
+            if data == "Confirmation Factor 1 Open Question":
                 display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
             st.dataframe(display_df)
             
             # Word Analysis Section
-            st.header('Word Analysis')
-            verb_active_df = analyze_action_phrases(search_df)
+            display_topic_analysis_kojk(search_df)
             
-            if not verb_active_df.empty:
-                st.dataframe(verb_active_df, use_container_width=True)
+        #     if not verb_active_df.empty:
+        #         st.dataframe(verb_active_df, use_container_width=True)
                 
-                st.subheader('Top Words')
-                top_words_fig = px.bar(
-                    verb_active_df.head(10), 
-                    x='keyword', 
-                    y='jumlah', 
-                    title='Top 10 Words'
-                )
-                st.plotly_chart(top_words_fig)
-            else:
-                st.write("No verb or active words found in the filtered dataset.")
+        #         st.subheader('Top Words')
+        #         top_words_fig = px.bar(
+        #             verb_active_df.head(10), 
+        #             x='keyword', 
+        #             y='jumlah', 
+        #             title='Top 10 Words'
+        #         )
+        #         st.plotly_chart(top_words_fig)
+        #     else:
+        #         st.write("No verb or active words found in the filtered dataset.")
             
-            # Keyword Analysis Section
-            if keyword_filter:
-                st.header('Keyword Analysis')
+        #     # Keyword Analysis Section
+        #     if keyword_filter:
+        #         st.header('Keyword Analysis')
                 
-                kw_freq_data = []
-                for kw in keyword_filter:
-                    kw_freq_row = {'Keyword': kw}
-                    for col in datasets1[data1]['open_questions']:
-                        count = filtered_df[col].apply(
-                            lambda x: kw in extract_keywords(x, stop_words)
-                        ).sum()
-                        kw_freq_row[f'{col} Count'] = count
+        #         kw_freq_data = []
+        #         for kw in keyword_filter:
+        #             kw_freq_row = {'Keyword': kw}
+        #             for col in datasets1[data]['open_questions']:
+        #                 count = filtered_df[col].apply(
+        #                     lambda x: kw in extract_keywords(x, stop_words)
+        #                 ).sum()
+        #                 kw_freq_row[f'{col} Count'] = count
                     
-                    kw_freq_data.append(kw_freq_row)
+        #             kw_freq_data.append(kw_freq_row)
                 
-                kw_freq_df = pd.DataFrame(kw_freq_data)
-                st.dataframe(kw_freq_df, use_container_width=True)
+        #         kw_freq_df = pd.DataFrame(kw_freq_data)
+        #         st.dataframe(kw_freq_df, use_container_width=True)
                 
-                bar_data = []
-                for col in datasets1[data1]['open_questions']:
-                    bar_data.append(
-                        go.Bar(
-                            name=col, 
-                            x=kw_freq_df['Keyword'], 
-                            y=kw_freq_df[f'{col} Count']
-                        )
-                    )
+        #         bar_data = []
+        #         for col in datasets1[data]['open_questions']:
+        #             bar_data.append(
+        #                 go.Bar(
+        #                     name=col, 
+        #                     x=kw_freq_df['Keyword'], 
+        #                     y=kw_freq_df[f'{col} Count']
+        #                 )
+        #             )
                 
-                fig = go.Figure(data=bar_data)
-                fig.update_layout(barmode='group', title='Keyword Frequencies in Open Questions')
-                st.plotly_chart(fig)
+        #         fig = go.Figure(data=bar_data)
+        #         fig.update_layout(barmode='group', title='Keyword Frequencies in Open Questions')
+        #         st.plotly_chart(fig)
         else:
             st.warning('No data loaded. Please check the data file path.')
             
@@ -711,22 +964,21 @@ def idi_page(data):
             display_df.drop(['NILAI_SENTIMEN'], axis=1, inplace=True) 
         st.dataframe(display_df)
 
-        st.header('Word Analysis')
-        verb_active_df = analyze_action_phrases(search_df)
+        display_topic_analysis_idi(search_df)
         
-        if not verb_active_df.empty:
-            st.dataframe(verb_active_df, use_container_width=True)
+        # if not verb_active_df.empty:
+        #     st.dataframe(verb_active_df, use_container_width=True)
             
-            st.subheader('Top Words')
-            top_words_fig = px.bar(
-                verb_active_df.head(10), 
-                x='keyword', 
-                y='jumlah', 
-                title='Top 10 Words'
-            )
-            st.plotly_chart(top_words_fig)
-        else:
-            st.write("No verb or active words found in the filtered dataset.")
+        #     st.subheader('Top Words')
+        #     top_words_fig = px.bar(
+        #         verb_active_df.head(10), 
+        #         x='keyword', 
+        #         y='jumlah', 
+        #         title='Top 10 Words'
+        #     )
+        #     st.plotly_chart(top_words_fig)
+        # else:
+        #     st.write("No verb or active words found in the filtered dataset.")
 
         if idi_keyword_filter:
             st.header('Keyword Analysis')
