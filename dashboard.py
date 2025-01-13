@@ -163,8 +163,7 @@ def display_topic_analysis(df):
     try:
         pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2.csv', sep=';')
         
-        # Menampilkan tabel dengan format yang lebih baik
-        st.subheader('Verb-Noun Pairs Analysis')
+        
         
         # Memformat persentase
         pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
@@ -225,7 +224,7 @@ def display_topic_analysis(df):
         )
         
         fig.update_layout(
-            height=600,  # Menyesuaikan tinggi grafik
+            height=600,  # Men  yesuaikan tinggi grafik
             yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
             showlegend=False
         )
@@ -237,6 +236,744 @@ def display_topic_analysis(df):
     except Exception as e:
         st.error(f"Error displaying topic analysis: {str(e)}")
         
+def display_topic_analysis_ARK(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis ARK')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_ARK.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+        
+def display_topic_analysis_IAKD(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis IAKD')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_IAKD.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+        
+def display_topic_analysis_KS(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis KS')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_KS.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+        
+def display_topic_analysis_MS(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis MS')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_MS.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+        
+def display_topic_analysis_PBKN(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis PBKN')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_PBKN.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+
+def display_topic_analysis_PEPK(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis PEPK')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_PEPK.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+
+def display_topic_analysis_PMDK(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis PMDK')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_PMDK.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+
+def display_topic_analysis_PPDP(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis PPDP')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_PPDP.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+
+def display_topic_analysis_PVML(df):
+    """
+    Menampilkan analisis topik dari pasangan kata kerja-kata benda
+    """
+    st.header('Topic Analysis PVML')
+    
+    # Membaca file CSV hasil analisis pasangan kata kerja-kata benda
+    try:
+        pairs_df = pd.read_csv('./data/hasil/topic_analysis_OQ2_PVML.csv', sep=';')
+        
+        
+        # Memformat persentase
+        pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
+        
+        # Mengatur urutan kolom dan nama kolom yang ditampilkan
+        display_df = pairs_df.rename(columns={
+            'Topic': 'Topik',
+            'Frequency': 'Frekuensi',
+            'Percentage': 'Persentase',
+        })
+        
+        # Menampilkan tabel
+        st.dataframe(
+            display_df,
+            column_config={
+                "Topik": st.column_config.TextColumn(
+                    "Topik",
+                    width="medium"
+                ),
+                "Frekuensi": st.column_config.NumberColumn(
+                    "Frekuensi",
+                    format="%d"
+                ),
+                "Persentase": st.column_config.TextColumn(
+                    "Persentase",
+                    width="small"
+                )
+            },
+            use_container_width=True
+        )
+        
+        # Menampilkan visualisasi distribusi pasangan kata kerja-kata benda
+        pairs_counts = pairs_df.groupby('Topic')['Frequency'].sum().reset_index()
+        pairs_counts = pairs_counts.sort_values('Frequency', ascending=True)  # Sort ascending untuk tampilan yang lebih baik
+        
+        # Hitung persentase untuk setiap pasangan
+        total_freq = pairs_counts['Frequency'].sum()
+        pairs_counts['Percentage'] = (pairs_counts['Frequency'] / total_freq * 100).round(2)
+        
+        # Buat bar chart horizontal
+        fig = px.bar(
+            pairs_counts,
+            y='Topic',
+            x='Frequency',
+            orientation='h',
+            title='Distribution of Verb-Noun Pairs',
+            labels={
+                'Topic': 'Pasangan Kata Kerja-Kata Benda',
+                'Frequency': 'Frekuensi'
+            },
+            text='Percentage'  # Menampilkan persentase di bar
+        )
+        
+        # Update layout dan format
+        fig.update_traces(
+            texttemplate='%{text:.2f}%',
+            textposition='auto',
+        )
+        
+        fig.update_layout(
+            height=600,  # Men  yesuaikan tinggi grafik
+            yaxis={'categoryorder': 'total ascending'},  # Mengurutkan berdasarkan frekuensi
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    except FileNotFoundError:
+        st.warning("Topic analysis data not found. Please run the analysis first.")
+    except Exception as e:
+        st.error(f"Error displaying topic analysis: {str(e)}")
+
 def display_topic_analysis_kojk(df):
     """
     Menampilkan analisis topik dari pasangan kata kerja-kata benda
@@ -247,8 +984,7 @@ def display_topic_analysis_kojk(df):
     try:
         pairs_df = pd.read_csv('./data/hasil/topic_analysis_KOJKOQ2.csv', sep=';')
         
-        # Menampilkan tabel dengan format yang lebih baik
-        st.subheader('Verb-Noun Pairs Analysis')
+        
         
         # Memformat persentase
         pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
@@ -331,8 +1067,7 @@ def display_topic_analysis_idi(df):
     try:
         pairs_df = pd.read_csv('./data/hasil/topic_analysis_idi_OQ2.csv', sep=';')
         
-        # Menampilkan tabel dengan format yang lebih baik
-        st.subheader('Verb-Noun Pairs Analysis')
+        
         
         # Memformat persentase
         pairs_df['Percentage'] = pairs_df['Percentage'].round(2).astype(str) + '%'
@@ -553,6 +1288,17 @@ def create_survey_dashboard(df, title, stop_words, open_question_columns):
         
         # Tampilkan topic analysis secara terpisah
         display_topic_analysis(search_df)
+        
+        display_topic_analysis_ARK(search_df)
+        
+        display_topic_analysis_IAKD(search_df)
+        display_topic_analysis_KS(search_df)
+        display_topic_analysis_MS(search_df)
+        display_topic_analysis_PBKN(search_df)
+        display_topic_analysis_PEPK(search_df)
+        display_topic_analysis_PMDK(search_df)
+        display_topic_analysis_PPDP(search_df)
+        display_topic_analysis_PVML(search_df)
         
         # # Lanjutkan dengan analisis verb active
         # if not verb_active_df.empty:
